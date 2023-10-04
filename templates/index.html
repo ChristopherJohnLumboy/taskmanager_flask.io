@@ -1,22 +1,46 @@
 {% extends 'base.html'%}
 {% block head %}
 <title>Task Manager</title>
+
+
 {% endblock %}
 
 {% block body %}
+<body onload="initClock()">
 
-<div class = "Content">
+</body>
+
+<div class = "Content" onload="initClock()">
     <h1 style="text-align: center;">Task Manager</h1>
+
+    <!--digital clock start-->
+    <div class="datetime center" style="margin-bottom: 20px;">
+        <div class="date">
+          <span id="dayname">Day</span>,
+          <span id="month">Month</span>
+          <span id="daynum">00</span>,
+          <span id="year">Year</span>
+        </div>
+        <div class="time">
+          <span id="hour">00</span>:
+          <span id="minutes">00</span>:
+          <span id="seconds">00</span>
+          <span id="period">AM</span>
+        </div>
+      </div>
+      <!--digital clock end-->
+
+
     {% if tasks|length < 1 %}
     <h4 style="text-align: center;">There are no task. Create one</h4>
     {% else %}
-        <table>
+        <table border="1" style="border-color: white;">
             <tr>
-                <th>Task</th>
+                <th >Task</th>
                 <th>
-                    Added
+                    Time
                 </th>
-                <th>Actions</th>
+                <th colspan="2">Actions</th>
 
             </tr>
             {% for task in tasks %}
@@ -24,10 +48,10 @@
                 <td>{{ task.content }}</td>
                 <td>{{ task.date_created.date() }}</td>
                 <td>
-                    <a href="/delete/{{task.id}}">Delete</a>
+                    <a href="/delete/{{task.id}}"><button class="delete_button" style="outline: none; border: none;">DELETE</button></a>
                 </td>
                 <td>
-                    <a href="/update/{{task.id}}">Update</a>
+                    <a href="/update/{{task.id}}"><button class="update_button" style="outline: none; border: none;">UPDATE</button></a>
                 </td>
             </tr>
         {% endfor%}
@@ -36,10 +60,52 @@
 
         <form action="/" method="POST" style=" display: flex;
         justify-content: center;
-        align-items: center;">
-            <input type="text" name="content" id = "content" class="center">
-            <input type="submit" value="Add Task">
+        align-items: center; margin-top: 15px;">
+            <input type="text" name="content" id = "content" style="margin-right: 5px;">
+            <input type="submit" value="ADD TASK">
         </form>
+
+
+        <script type="text/javascript">
+            function updateClock(){
+              var now = new Date();
+              var dname = now.getDay(),
+                  mo = now.getMonth(),
+                  dnum = now.getDate(),
+                  yr = now.getFullYear(),
+                  hou = now.getHours(),
+                  min = now.getMinutes(),
+                  sec = now.getSeconds(),
+                  pe = "AM";
+        
+                  if(hou >= 12){
+                    pe = "PM";
+                  }
+                  if(hou == 0){
+                    hou = 12;
+                  }
+                  if(hou > 12){
+                    hou = hou - 12;
+                  }
+        
+                  Number.prototype.pad = function(digits){
+                    for(var n = this.toString(); n.length < digits; n = 0 + n);
+                    return n;
+                  }
+        
+                  var months = ["January", "February", "March", "April", "May", "June", "July", "Augest", "September", "October", "November", "December"];
+                  var week = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                  var ids = ["dayname", "month", "daynum", "year", "hour", "minutes", "seconds", "period"];
+                  var values = [week[dname], months[mo], dnum.pad(2), yr, hou.pad(2), min.pad(2), sec.pad(2), pe];
+                  for(var i = 0; i < ids.length; i++)
+                  document.getElementById(ids[i]).firstChild.nodeValue = values[i];
+            }
+        
+            function initClock(){
+              updateClock();
+              window.setInterval("updateClock()", 1);
+            }
+            </script>
 
 </div>
 {% endblock %}
